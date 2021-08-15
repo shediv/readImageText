@@ -26,7 +26,28 @@ function App() {
     await worker.loadLanguage('eng');
     await worker.initialize('eng');
     const { data: { text } } = await worker.recognize(image);
-    setOcr(text);
+    await setOcr(text);
+    await convertTextToLocalLang(text)
+  };
+
+  const convertTextToLocalLang = async (textEng) => {
+    setOcr('Reading Completed...!');
+    setOcr('Converting..............');
+    fetch(
+      `https://node-watson-api.herokuapp.com/api?text=${textEng}`,
+      {
+        method: "GET",
+        headers: new Headers({
+          'Content-Type': 'application/json'
+        })
+      }
+    )
+    .then(res => res.json())
+    .then(response => {
+      console.log("response = ", response.msg)
+      setOcr(response.msg);
+    })
+    .catch(error => console.log(error));
   };
 
   useEffect(() => {
